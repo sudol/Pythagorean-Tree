@@ -1,6 +1,12 @@
+
 window.onload = function() {
     canvas = document.getElementById("main");
     ctx = canvas.getContext("2d");
+
+    /*
+     * Scaling canvas taken from Paul Lewis
+     * http://www.html5rocks.com/en/tutorials/canvas/hidpi/
+     */
     var devicePixelRatio = window.devicePixelRatio || 1,
         backingStoreRatio = ctx.webkitBackingStorePixelRatio ||
                             ctx.mozBackingStorePixelRatio ||
@@ -36,20 +42,16 @@ window.onload = function() {
         ctx.scale(ratio, ratio);
     }
 
-    //drawTree();
-
     var trunk = new branch();
 
-    trunk.length = 130;
+    trunk.level = 1;
+    trunk.length = 200;
     trunk.angle = 90;
-    trunk.parent = {x:canvas.width/ratio/2, y:canvas.height/ratio}
+    trunk.parent = {x:canvas.width/ratio/2, y:canvas.height/ratio};
     trunk.x = canvas.width/ratio/2;
     trunk.y = trunk.parent.y - trunk.length;
 
-    trunk.iterate(11);
-
-    trunk.draw();
-
+    trunk.iterate(15);
 }
 
 function branch(parent) {
@@ -61,47 +63,41 @@ function branch(parent) {
     this.children = [];
 
     this.iterate = function (level) {
-        if (level == 0)
+        if (this.level >= level)
             return;
-        else level--;
+
+        this.draw();
 
         var childBranch = new branch(this);
-        childBranch.angle = this.angle - 45;
-        if (childBranch.angle > 359)
-            childBranch.angle = 0;
 
-
-
+        childBranch.angle = this.angle - 65;
+        childBranch.level = this.level + 1;
         childBranch.length = ((this.length/Math.sin(90 * (Math.PI/180))) * Math.sin(45 * (Math.PI/180)));
-
-
         childBranch.x = this.x - (Math.cos(childBranch.angle * (Math.PI/180)) * childBranch.length);
         childBranch.y = this.y - (Math.sin(childBranch.angle * (Math.PI/180)) * childBranch.length);
-
 
         this.children.push(childBranch);
         childBranch.iterate(level);
 
         var childBranch = new branch(this);
-        childBranch.angle = this.angle + 45;
 
+        childBranch.angle = this.angle + 25;
+        childBranch.level = this.level + 1;
         childBranch.length = ((this.length/Math.sin(90 * (Math.PI/180))) * Math.sin(45 * (Math.PI/180)));
         childBranch.x = this.x - (Math.cos(childBranch.angle * (Math.PI/180)) * childBranch.length);
         childBranch.y = this.y - (Math.sin(childBranch.angle * (Math.PI/180)) * childBranch.length);
-        //
+
         this.children.push(childBranch);
         childBranch.iterate(level);
     }
 
     this.draw = function () {
 
+        ctx.beginPath();
         ctx.moveTo(this.parent.x, this.parent.y);
         ctx.lineTo(this.x, this.y)
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "rgba(0,0,0," + 1/this.level + ")";
         ctx.stroke();
-
-        for (x in this.children) {
-            this.children[x].draw();
-        }
     }
-
 };
