@@ -97,7 +97,7 @@ function branch(parent) {
         ctx.moveTo(this.parent.x, this.parent.y);
         ctx.lineTo(this.x, this.y)
         ctx.lineWidth = 2;
-        ctx.strokeStyle = "rgba(0,0,0," + 1/this.level + ")";
+        ctx.strokeStyle = "rgba(255,255,255," + 1/this.level + ")";
         ctx.stroke();
     }
 };
